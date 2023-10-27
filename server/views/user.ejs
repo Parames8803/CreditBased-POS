@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>User Page</title>
+  <style>
+    button{
+      width: 100px;
+      border: 1px solid white;
+      background-color: crimson;
+      color: white;
+      cursor: pointer;
+      height: 35px;
+      font-size: 20px;
+      border-radius: 5px;
+    }
+    h3{
+      color: blueviolet;
+    }
+    span{
+      color: teal;
+    }
+  </style>
+</head>
+<body>
+  <h1>User Page</h1>
+  <h3>Welcome, <span><%= user.username %> </span><br/> Subcription Status : <%= user.status %> <br/> Your Credit Points : <%= user.creditPoints %></h3>
+  <button id="postButton">Post</button>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.24.0/axios.min.js"></script>
+  <script>
+    const postButton = document.getElementById('postButton');
+    postButton.addEventListener('click', async () => {
+      try {
+        const response = await axios.post(`/user/<%= user.id %>/post`);
+        if (response.data.status === 'low_credit') {
+          const confirmUpgrade = confirm('Credit points are low. Do you want to upgrade?');
+          if (confirmUpgrade) {
+            await axios.post(`/user/<%= user.id %>/upgrade`);
+            location.reload();
+          }else{
+            document.getElementById("postButton").disabled = true;
+          }
+        } else {
+          alert('Post successful! Your new credit points: ' + response.data.creditPoints);
+          location.reload();
+        }
+      } catch (error) {
+        alert('Error posting: ' + error.message);
+      }
+    });
+  </script>
+</body>
+</html>
